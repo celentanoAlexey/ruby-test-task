@@ -33,28 +33,39 @@ class SMBClient
     logger.debug("Navigated into folder: #{shared_folder}")
   end
 
-  def upload_entity(shared_folder)
+  def upload_entity(entity)
     # return false if client.exists?(shared_folder)
 
     # create_folder(shared_folder)
     # navigate_into_folder(shared_folder)
 
-    # here 'Dir[shared_folder + "/**/*"]' (same as Dir.glob is used to recursively grab all entries in the folder)
-    entries = Dir[shared_folder + "/**/*"]
 
-    entries.each do |entity|
-      # client.put(entity, entity)
-
-      if File.file?(entity)
-        logger.debug("file '#{entity}' has been uploaded")
-      elsif File.directory? entity
-        logger.debug("folder '#{entity}' has been uploaded")
+    entries = Dir[entity + '/*']
+    entries.each do |entry|
+      if File.directory? entry
+        # client.put(entry, entry)
+        logger.debug("uploading folder: #{entry}")
+        upload_entity(entry)
+      elsif File.file? entry
+        if matches_filter_criteria(entry)
+          # client.put(entry, entry)
+          logger.debug("uploading file: #{entry}")
+        end
       end
     end
-
-    def disconnect
-      # client.close
-      logger.debug("connection to smb closed")
     end
+
+    def matches_filter_criteria(filename)
+      extension_pattern = '.bat'
+      filename_pattern = '1234'
+
+      (File.extname(filename).eql? extension_pattern) && (File.basename(filename).start_with?(filename_pattern))
+    end
+
+
+  def disconnect
+    # client.close
+    logger.debug("connection to smb closed")
   end
 end
+
