@@ -13,16 +13,3 @@ else
 end
 
 smb_client.disconnect
-
-
-
-
-
-
-
-
-
-
-
-
-
